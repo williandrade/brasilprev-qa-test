@@ -16,6 +16,7 @@ import br.com.brasilprev.modelo.Pessoa;
 import br.com.brasilprev.modelo.Telefone;
 import br.com.brasilprev.repository.PessoaRepository;
 import br.com.brasilprev.service.PessoaService;
+import br.com.brasilprev.service.exception.CpfNaoEncontradoException;
 import br.com.brasilprev.service.exception.TelefoneNaoEncontradoException;
 import br.com.brasilprev.service.exception.UnicidadeCpfException;
 import br.com.brasilprev.service.exception.UnicidadeTelefoneException;
@@ -34,8 +35,10 @@ public class PessoaServiceImpl implements PessoaService {
 	public Pessoa salvar(PessoaDto pessoaDto) throws UnicidadeCpfException, UnicidadeTelefoneException {
 		ValidarExistencia(pessoaDto);
 
-		List<Endereco> enderecos = pessoaDto.enderecos.stream().map(e -> mapearEndereco(e)).collect(Collectors.toList());
-		List<Telefone> telefones = pessoaDto.telefones.stream().map(t -> mapearTelefone(t)).collect(Collectors.toList());
+		List<Endereco> enderecos = pessoaDto.enderecos.stream().map(e -> mapearEndereco(e))
+				.collect(Collectors.toList());
+		List<Telefone> telefones = pessoaDto.telefones.stream().map(t -> mapearTelefone(t))
+				.collect(Collectors.toList());
 		Pessoa pessoa = new Pessoa(pessoaDto.nome, pessoaDto.cpf, enderecos, telefones);
 
 		return pessoaRepository.save(pessoa);
@@ -63,8 +66,8 @@ public class PessoaServiceImpl implements PessoaService {
 	}
 
 	private Endereco mapearEndereco(EnderecoDto endereco) {
-		return new Endereco(endereco.logradouro, endereco.numero, endereco.complemento, endereco.bairro, endereco.cidade,
-				endereco.estado);
+		return new Endereco(endereco.logradouro, endereco.numero, endereco.complemento, endereco.bairro,
+				endereco.cidade, endereco.estado);
 	}
 
 	@Override
@@ -72,5 +75,11 @@ public class PessoaServiceImpl implements PessoaService {
 		Optional<Pessoa> optional = pessoaRepository.findByTelefoneDddAndTelefoneNumero(ddd, telefone);
 		return optional.orElseThrow(
 				() -> new TelefoneNaoEncontradoException("Não existe pessoa com o telefone (" + ddd + ")" + telefone));
+	}
+
+	@Override
+	public Pessoa buscarPorCpf(String cpf) throws CpfNaoEncontradoException {
+		Optional<Pessoa> optional = pessoaRepository.findByCpf(cpf);
+		return optional.orElseThrow(() -> new CpfNaoEncontradoException("Não existe pessoa com o cpf (" + cpf + ")"));
 	}
 }

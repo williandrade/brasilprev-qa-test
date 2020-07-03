@@ -45,7 +45,7 @@ public class PessoaRepositoryImpl implements PessoaRepositoryQueries {
 		}
 
 		if (StringUtils.hasText(filtro.getTelefone())) {
-			sb.append(" AND telefone.numero = :numero ");
+			sb.append(" AND telefone.numero LIKE :numero ");
 			params.put("numero", filtro.getTelefone());
 		}
 

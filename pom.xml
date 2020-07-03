@@ -58,6 +58,10 @@
 			<artifactId>rest-assured</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>json-schema-validator</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>

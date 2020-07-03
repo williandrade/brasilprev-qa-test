@@ -21,6 +21,7 @@ import br.com.brasilprev.modelo.Pessoa;
 import br.com.brasilprev.repository.PessoaRepository;
 import br.com.brasilprev.repository.filtro.PessoaFiltro;
 import br.com.brasilprev.service.PessoaService;
+import br.com.brasilprev.service.exception.CpfNaoEncontradoException;
 import br.com.brasilprev.service.exception.TelefoneNaoEncontradoException;
 import br.com.brasilprev.service.exception.UnicidadeCpfException;
 import br.com.brasilprev.service.exception.UnicidadeTelefoneException;
@@ -39,6 +40,13 @@ public class PessoaResource {
 	public ResponseEntity<Pessoa> buscarPorDddENumeroDoTelefone(@PathVariable("ddd") String ddd,
 			@PathVariable("numero") String numero) throws TelefoneNaoEncontradoException {
 		Pessoa pessoa = pessoaService.buscarPorTelefone(ddd, numero);
+
+		return new ResponseEntity<>(pessoa, HttpStatus.OK);
+	}
+
+	@GetMapping("/cpf/{cpf}")
+	public ResponseEntity<Pessoa> buscarPorCpf(@PathVariable("cpf") String cpf) throws CpfNaoEncontradoException {
+		Pessoa pessoa = pessoaService.buscarPorCpf(cpf);
 
 		return new ResponseEntity<>(pessoa, HttpStatus.OK);
 	}
@@ -71,6 +79,11 @@ public class PessoaResource {
 
 	@ExceptionHandler({ TelefoneNaoEncontradoException.class })
 	public ResponseEntity<Erro> handleTelefoneNaoEncontradoException(TelefoneNaoEncontradoException e) {
+		return new ResponseEntity<>(new Erro(e.getMessage()), HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler({ CpfNaoEncontradoException.class })
+	public ResponseEntity<Erro> handleCpfNaoEncontradoException(CpfNaoEncontradoException e) {
 		return new ResponseEntity<>(new Erro(e.getMessage()), HttpStatus.NOT_FOUND);
 	}
 
